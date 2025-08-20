@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AeroKo'rish - Dron Do'koni{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-gradient: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #1a1a2e;
+            --text-light: rgba(255, 255, 255, 0.9);
+            --shadow-soft: 0 20px 40px rgba(0, 0, 0, 0.1);
+            --shadow-strong: 0 30px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background: #000;
+        }
+
+        /* Animated Background */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .background-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.3;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .floating-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        .floating-particle:nth-child(odd) {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            animation-duration: 25s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Glassmorphism Header */
+        header {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-soft);
+        }
+
+        header.scrolled {
+            top: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(0);
+        }
+
+        .logo {
+            height: 50px;
+            width: auto;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 5px 15px rgba(102, 126, 234, 0.3));
+        }
+
+        .logo:hover {
+            transform: scale(1.05) translateY(-2px);
+            filter: drop-shadow(0 10px 25px rgba(102, 126, 234, 0.5));
+        }
+
+        /* Modern Navigation */
+        .navbar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            position: relative;
+            padding: 12px 24px;
+            border-radius: 50px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: transparent;
+            border: 1px solid transparent;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50px;
+            padding: 1px;
+            background: var(--primary-gradient);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: white;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-item:hover::before {
+            opacity: 1;
+        }
+
+        .nav-item.active {
+            color: white;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-item.active::before {
+            opacity: 1;
+        }
+
+        /* Mobile Menu */
+        #check { display: none; }
+
+        .icons {
+            display: none;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+
+        /* Main Content Container */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+        }
+
+        /* Content sections for pages */
+        .content-section {
+            padding: 6rem 0;
+            position: relative;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 2rem 0;
+            color: white;
+        }
+
+        .content-section:first-child {
+            margin-top: 100px; /* Account for fixed header */
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 4rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Product Cards */
+        .product-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            height: 100%;
+            color: white;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+        }
+
+        .product-card:hover {
+            transform: translateY(-20px) scale(1.02);
+            box-shadow: 0 40px 80px rgba(102, 126, 234, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .product-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .card-img-top {
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .product-card:hover .card-img-top {
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        .card-body {
+            padding: 2rem;
+            color: white;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .card-text {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .text-primary {
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        .badge.bg-success {
+            background: var(--success-gradient) !important;
+        }
+
+        .badge.bg-danger {
+            background: var(--accent-gradient) !important;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+        .btn-primary:hover::before {
+            opacity: 1;
+        }
+
+        .btn-outline-primary {
+            border: 2px solid rgba(102, 126, 234, 0.5);
+            color: #667eea;
+            background: transparent;
+            border-radius: 50px;
+            padding: 10px 22px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-secondary {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.8);
+            background: transparent;
+            border-radius: 50px;
+            padding: 10px 22px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.6);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Form Controls */
+        .form-control, .form-select {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            color: white;
+            padding: 12px 16px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #667eea;
+            color: white;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            color: white;
+        }
+
+        .card-header {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--glass-border);
+            border-radius: 20px 20px 0 0 !important;
+        }
+
+        /* Pagination */
+        .pagination .page-link {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0 4px;
+            border-radius: 10px;
+            padding: 10px 16px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination .page-link:hover {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .pagination .page-item.active .page-link {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            color: white;
+        }
+
+        /* Alert Messages */
+        .alert {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            color: white;
+            border-left: 4px solid #667eea;
+        }
+
+        .alert-success {
+            border-left-color: #4facfe;
+        }
+
+        .alert-danger {
+            border-left-color: #f5576c;
+        }
+
+        .alert-warning {
+            border-left-color: #f093fb;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark-gradient);
+            color: white;
+            position: relative;
+            padding: 4rem 0 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 4rem;
+        }
+
+        .footer-section h5 {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+        }
+
+        .footer-link:hover {
+            color: #667eea;
+            transform: translateX(10px);
+        }
+
+        .social-link {
+            width: 50px;
+            height: 50px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-right: 1rem;
+        }
+
+        .social-link:hover {
+            background: var(--primary-gradient);
+            transform: translateY(-5px) rotate(10deg);
+            color: white;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Scroll to Top Button */
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            z-index: 999;
+        }
+
+        .scroll-top-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .icons { display: flex; }
+
+            header {
+                left: 10px;
+                right: 10px;
+                padding: 1rem 1.5rem;
+            }
+
+            .navbar {
+                position: fixed;
+                top: 90px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 90px);
+                background: rgba(0, 0, 0, 0.95);
+                backdrop-filter: blur(30px);
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                padding-top: 3rem;
+                transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                gap: 2rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            #check:checked ~ .navbar {
+                left: 0;
+            }
+
+            .nav-item {
+                font-size: 1.2rem;
+                padding: 1rem 2rem;
+                width: 80%;
+                text-align: center;
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                border: 1px solid var(--glass-border);
+                border-radius: 15px;
+            }
+
+            .content-section:first-child {
+                margin-top: 80px;
+            }
+
+            .scroll-top-btn {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 3px solid transparent;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #667eea, #764ba2, #f093fb, #667eea);
+            animation: spin 1s linear infinite;
+            position: relative;
+        }
+
+        .loader::before {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            background: var(--dark-gradient);
+            border-radius: 50%;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div class="loading-overlay" id="loading">
+    <div class="loader"></div>
+</div>
+
+<!-- Background -->
+<div class="background-container">
+    <video autoplay loop muted playsinline class="background-video">
+        <source src="https://github.com/ecemgo/mini-samples-great-tricks/assets/13468728/82f375e7-244f-4c21-90ac-9abd7549ed05" type="video/mp4">
+    </video>
+    <div class="floating-elements" id="floating-elements"></div>
+</div>
+
+<!-- Header -->
+<header id="header">
+    <a href="{% url 'home' %}">
+        <svg class="logo" width="200" height="60" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+              <stop offset="50%" style="stop-color:#764ba2;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#f093fb;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+            </linearGradient>
+            <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+              <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+            </radialGradient>
+            <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+              <feOffset dx="0" dy="2" result="offset"/>
+              <feComponentTransfer>
+                <feFuncA type="linear" slope="0.3"/>
+              </feComponentTransfer>
+              <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- Background Circle with Glow -->
+          <circle cx="40" cy="40" r="35" fill="url(#glowGradient)" opacity="0.2">
+            <animate attributeName="r" values="35;38;35" dur="3s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Main Drone Body -->
+          <ellipse cx="40" cy="40" rx="12" ry="8" fill="url(#primaryGradient)" filter="url(#dropShadow)">
+            <animate attributeName="ry" values="8;9;8" dur="2s" repeatCount="indefinite"/>
+          </ellipse>
+
+          <!-- Drone Arms -->
+          <g filter="url(#glow)">
+            <line x1="40" y1="40" x2="25" y2="25" stroke="url(#accentGradient)" stroke-width="3" stroke-linecap="round">
+              <animate attributeName="stroke-width" values="3;4;3" dur="2s" repeatCount="indefinite"/>
+            </line>
+            <line x1="40" y1="40" x2="55" y2="25" stroke="url(#accentGradient)" stroke-width="3" stroke-linecap="round">
+              <animate attributeName="stroke-width" values="3;4;3" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+            </line>
+            <line x1="40" y1="40" x2="25" y2="55" stroke="url(#accentGradient)" stroke-width="3" stroke-linecap="round">
+              <animate attributeName="stroke-width" values="3;4;3" dur="2s" repeatCount="indefinite" begin="1s"/>
+            </line>
+            <line x1="40" y1="40" x2="55" y2="55" stroke="url(#accentGradient)" stroke-width="3" stroke-linecap="round">
+              <animate attributeName="stroke-width" values="3;4;3" dur="2s" repeatCount="indefinite" begin="1.5s"/>
+            </line>
+          </g>
+
+          <!-- Propellers -->
+          <g id="propellers">
+            <g transform-origin="25 25">
+              <circle cx="25" cy="25" r="8" fill="none" stroke="url(#primaryGradient)" stroke-width="1.5" opacity="0.7"/>
+              <line x1="17" y1="25" x2="33" y2="25" stroke="url(#primaryGradient)" stroke-width="2" stroke-linecap="round"/>
+              <line x1="25" y1="17" x2="25" y2="33" stroke="url(#primaryGradient)" stroke-width="2" stroke-linecap="round"/>
+              <animateTransform attributeName="transform" type="rotate" values="0;360" dur="0.5s" repeatCount="indefinite"/>
+            </g>
+            <g transform-origin="55 25">
+              <circle cx="55" cy="25" r="8" fill="none" stroke="url(#primaryGradient)" stroke-width="1.5" opacity="0.7"/>
+              <line x1="47" y1="25" x2="63" y2="25" stroke="url(#primaryGradient)" stroke-width="2" stroke-linecap="round"/>
+              <line x1="55" y1="17" x2="55" y2="33" stroke="url(#primaryGradient)" stroke-width="2" stroke-linecap="round"/>
+              <animateTransform attributeName="transform" type="rotate" values="360;0" dur="0.5s" repeatCount="indefinite"/>
+            </g>
+            <g transform-origin="25 55">
+              <circle cx="25" cy="55" r="8" fill="none" stroke="url(#primaryGradient)" stroke-width="1.5" opacity="0.7"/>
+              <line x1="17" y1="55" x2="33" y2="55" stroke="url(#primaryGradient)" stroke-width="2" stroke-linecap="round"/>
+              <line x1="25" y1="47" x2="25" y2="63" stroke="url(#primaryGradient)" stroke-width="2" stroke-linecap="round"/>
+              <animateTransform attributeName="transform" type="rotate" values="360;0" dur="0.5s" repeatCount="indefinite"/>
+            </g>
+            <g transform-origin="55 55">
+              <circle cx="55" cy="55" r="8" fill="none" stroke="url(#primaryGradient)" stroke-width="1.5" opacity="0.7"/>
+              <line x1="47" y1="55" x2="63" y2="55" stroke="url(#primaryGradient)" stroke-width="2" stroke-linecap="round"/>
+              <line x1="55" y1="47" x2="55" y2="63" stroke="url(#primaryGradient)" stroke-width="2" stroke-linecap="round"/>
+              <animateTransform attributeName="transform" type="rotate" values="0;360" dur="0.5s" repeatCount="indefinite"/>
+            </g>
+          </g>
+
+          <!-- Center Camera/Gimbal -->
+          <circle cx="40" cy="42" r="4" fill="url(#accentGradient)" filter="url(#dropShadow)">
+            <animate attributeName="r" values="4;5;4" dur="3s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="40" cy="42" r="2" fill="#ffffff" opacity="0.8"/>
+
+          <!-- LED Lights -->
+          <circle cx="40" cy="30" r="1.5" fill="#00ff88">
+            <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="40" cy="50" r="1.5" fill="#ff3366">
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Company Name -->
+          <text x="95" y="35" font-family="Inter, sans-serif" font-weight="800" font-size="18" fill="url(#primaryGradient)">
+            Aero
+          </text>
+          <text x="95" y="55" font-family="Inter, sans-serif" font-weight="600" font-size="16" fill="url(#accentGradient)">
+            Ko'rish
+          </text>
+
+          <!-- Decorative Elements -->
+          <g opacity="0.6">
+            <circle cx="170" cy="20" r="2" fill="url(#primaryGradient)">
+              <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="180" cy="30" r="1.5" fill="url(#accentGradient)">
+              <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="175" cy="45" r="1" fill="url(#primaryGradient)">
+              <animate attributeName="opacity" values="0.3;1;0.3" dur="2.5s" repeatCount="indefinite"/>
+            </circle>
+          </g>
+
+          <!-- Tagline -->
+          <text x="95" y="68" font-family="Inter, sans-serif" font-weight="400" font-size="8" fill="#667eea" opacity="0.8">
+            PROFESSIONAL DRONES
+          </text>
+        </svg>
+    </a>
+
+    <input type="checkbox" id="check">
+    <label for="check" class="icons">
+        <i class="bx bx-menu" id="menu-icon"></i>
+    </label>
+    <nav class="navbar">
+        <a href="{% url 'home' %}" class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Bosh sahifa</a>
+        <a href="{% url 'about' %}" class="nav-item {% if request.resolver_match.url_name == 'about' %}active{% endif %}">Xizmatlar</a>
+        <a href="{% url 'drone_list' %}" class="nav-item {% if request.resolver_match.url_name == 'drone_list' %}active{% endif %}">Dronlar</a>
+        <a href="{% url 'contact' %}" class="nav-item {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Aloqa</a>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'cart' %}" class="nav-item">
+                <i class="fas fa-shopping-cart"></i> Savat
+            </a>
+            <a href="{% url 'profile' %}" class="nav-item">
+                <i class="fas fa-user"></i> {{ user.username }}
+            </a>
+            <a href="{% url 'logout' %}" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i> Chiqish
+            </a>
+        {% else %}
+            <a href="{% url 'login' %}" class="nav-item">
+                <i class="fas fa-sign-in-alt"></i> Kirish
+            </a>
+            <a href="{% url 'register' %}" class="nav-item">
+                <i class="fas fa-user-plus"></i> Ro'yxat
+            </a>
+        {% endif %}
+    </nav>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container" style="padding-top: 120px;">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Content Block -->
+    {% block content %}
+    <!-- Default hero section for home page -->
+    <section class="content-section" style="margin-top: 0; padding-top: 120px; min-height: 100vh; display: flex; align-items: center;">
+        <div class="container">
+            <div class="text-center">
+                <h1 style="font-size: clamp(2.5rem, 8vw, 5.5rem); font-weight: 800; margin-bottom: 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    AeroKo'rish
+                </h1>
+                <p style="font-size: clamp(1.1rem, 3vw, 1.6rem); margin-bottom: 3rem; color: rgba(255, 255, 255, 0.8); font-weight: 400; line-height: 1.6;">
+                    Kelajakning professional dronlari va eng ilg'or texnologiyalari bilan tanishing
+                </p>
+                <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="{% url 'drone_list' %}" class="btn-primary" style="display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font-size: 1.1rem; padding: 18px 36px;">
+                        <i class="fas fa-rocket"></i>
+                        <span>Dronlarni o'rganing</span>
+                    </a>
+                    <a href="{% url 'about' %}" class="btn-outline-secondary" style="display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font-size: 1.1rem; padding: 18px 36px;">
+                        <i class="fas fa-play"></i>
+                        <span>Batafsil ma'lumot</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endblock %}
+</main>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h5><i class="fas fa-drone me-2"></i>AeroKo'rish</h5>
+                    <p class="mb-4">Kelajakning eng ilg'or dron texnologiyalari va professional xizmatlar. Sizning orzularingizni amalga oshirishga yordam beramiz.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-telegram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h5><i class="fas fa-link me-2"></i>Havolalar</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'home' %}" class="footer-link"><i class="fas fa-home me-2"></i>Bosh sahifa</a></li>
+                        <li><a href="{% url 'about' %}" class="footer-link"><i class="fas fa-info-circle me-2"></i>Xizmatlar</a></li>
+                        <li><a href="{% url 'drone_list' %}" class="footer-link"><i class="fas fa-drone me-2"></i>Dronlar</a></li>
+                        <li><a href="{% url 'contact' %}" class="footer-link"><i class="fas fa-envelope me-2"></i>Aloqa</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h5><i class="fas fa-headset me-2"></i>Yordam</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="footer-link"><i class="fas fa-question-circle me-2"></i>Savol-javoblar</a></li>
+                        <li><a href="#" class="footer-link"><i class="fas fa-shield-alt me-2"></i>Kafolat</a></li>
+                        <li><a href="#" class="footer-link"><i class="fas fa-shipping-fast me-2"></i>Yetkazish</a></li>
+                        <li><a href="#" class="footer-link"><i class="fas fa-undo me-2"></i>Qaytarish</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h5><i class="fas fa-map-marker-alt me-2"></i>Aloqa</h5>
+                    <div class="contact-info">
+                        <p class="footer-link mb-3">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            Toshkent shahar, Chilonzor tumani
+                        </p>
+                        <p class="footer-link mb-3">
+                            <i class="fas fa-phone me-2"></i>
+                            <a href="tel:+998901234567" style="color: inherit;">+998 90 123 45 67</a>
+                        </p>
+                        <p class="footer-link mb-3">
+                            <i class="fas fa-envelope me-2"></i>
+                            <a href="mailto:info@aerokorish.uz" style="color: inherit;">info@aerokorish.uz</a>
+                        </p>
+                        <p class="footer-link">
+                            <i class="fas fa-clock me-2"></i>
+                            24/7 xizmat
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4" style="border-color: rgba(255,255,255,0.2);">
+        <div class="text-center">
+            <p class="mb-0" style="color: rgba(255,255,255,0.8);">
+                &copy; 2025 <strong style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">AeroKo'rish</strong>. Barcha huquqlar himoyalangan.
+                <i class="fas fa-heart" style="color: #f093fb;"></i> bilan ishlab chiqarildi
+            </p>
+        </div>
+    </div>
+</footer>
+
+<!-- Scroll to Top Button -->
+<button id="scrollTop" class="scroll-top-btn">
+    <i class="fas fa-chevron-up"></i>
+</button>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JavaScript -->
+<script>
+    // CSRF token for Django
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+               document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    }
+
+    // Loading Screen
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.classList.add('hidden');
+            }
+        }, 1000);
+    });
+
+    // Create Floating Particles
+    function createFloatingParticles() {
+        const container = document.getElementById('floating-elements');
+        if (!container) return;
+
+        const particleCount = 30;
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('floating-particle');
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+            container.appendChild(particle);
+        }
+    }
+    createFloatingParticles();
+
+    // Header Scroll Effect
+    let lastScrollY = window.scrollY;
+    const header = document.getElementById('header');
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 100) {
+            header?.classList.add('scrolled');
+        } else {
+            header?.classList.remove('scrolled');
+        }
+
+        // Show/hide scroll top button
+        const scrollTopBtn = document.getElementById('scrollTop');
+        if (window.scrollY > 300) {
+            if (scrollTopBtn) scrollTopBtn.style.display = 'flex';
+        } else {
+            if (scrollTopBtn) scrollTopBtn.style.display = 'none';
+        }
+
+        lastScrollY = window.scrollY;
+    });
+
+    // Smooth Scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                // Close mobile menu if open
+                const checkBox = document.getElementById('check');
+                if (checkBox) checkBox.checked = false;
+            }
+        });
+    });
+
+    // Scroll to Top Functionality
+    const scrollTopBtn = document.getElementById('scrollTop');
+    if (scrollTopBtn) {
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+
+    // Mobile Menu Auto-close
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const checkBox = document.getElementById('check');
+            if (checkBox) checkBox.checked = false;
+        });
+    });
+
+    // Add to Cart Functionality
+    function addToCart(productId, quantity = 1) {
+        const csrfToken = getCSRFToken();
+
+        if (!csrfToken) {
+            console.error('CSRF token not found');
+            return;
+        }
+
+        fetch('/add-to-cart/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrfToken,
+            },
+            body: `product_id=${productId}&quantity=${quantity}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                showMessage('Mahsulot savatga qo\'shildi!', 'success');
+            } else {
+                showMessage(data.error || 'Xatolik yuz berdi', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Tarmoq xatoligi yuz berdi', 'error');
+        });
+    }
+
+    // Show message function
+    function showMessage(message, type = 'success') {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show position-fixed"
+                 style="top: 100px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', alertHtml);
+
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            if (alerts.length > 0) {
+                alerts[alerts.length - 1].remove();
+            }
+        }, 3000);
+    }
+
+    // Initialize intersection observer for animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observe elements for animation
+    document.querySelectorAll('.product-card, .card, .content-section').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+        observer.observe(el);
+    });
+
+    console.log('AeroKo\'rish website loaded successfully! 🚁✨');
+</script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

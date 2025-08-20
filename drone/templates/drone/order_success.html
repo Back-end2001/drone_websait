@@ -1,0 +1,122 @@
+{% extends 'drone/base.html' %}
+
+{% block title %}Buyurtma Muvaffaqiyatli - AeroKo'rish{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                <h1 class="h2 text-success">Buyurtmangiz Qabul Qilindi!</h1>
+                <p class="lead">Rahmat! Sizning buyurtmangiz muvaffaqiyatli qabul qilindi.</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Buyurtma Tafsilotlari</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Buyurtma raqami:</strong></div>
+                        <div class="col-sm-8">{{ order.order_number }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Sana:</strong></div>
+                        <div class="col-sm-8">{{ order.created_at|date:"d.m.Y H:i" }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Holat:</strong></div>
+                        <div class="col-sm-8">
+                            <span class="badge bg-warning">{{ order.get_status_display }}</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Jami summa:</strong></div>
+                        <div class="col-sm-8"><strong class="text-primary">${{ order.total_amount }}</strong></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Yetkazib berish manzili:</strong></div>
+                        <div class="col-sm-8">{{ order.shipping_address }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Telefon:</strong></div>
+                        <div class="col-sm-8">{{ order.phone }}</div>
+                    </div>
+                    {% if order.notes %}
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Izohlar:</strong></div>
+                        <div class="col-sm-8">{{ order.notes }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Buyurtma Mahsulotlari</h5>
+                </div>
+                <div class="card-body">
+                    {% for item in order.items.all %}
+                    <div class="row align-items-center py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                {% if item.drone.image %}
+                                    <img src="{{ item.drone.image.url }}" class="me-3 rounded" alt="{{ item.drone.name_uz }}" style="width: 50px; height: 50px; object-fit: cover;">
+                                {% else %}
+                                    <div class="me-3 bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-drone text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-0">{{ item.drone.name_uz }}</h6>
+                                    <small class="text-muted">{{ item.drone.category.name_uz }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <span class="fw-bold">${{ item.price }}</span>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <span>{{ item.quantity }} dona</span>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <span class="fw-bold">${{ item.get_total_price }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-8"></div>
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-between">
+                                <strong>Jami:</strong>
+                                <strong class="text-primary">${{ order.total_amount }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mt-4">
+                <h6><i class="fas fa-info-circle me-2"></i>Keyingi Qadamlar</h6>
+                <ul class="mb-0">
+                    <li>Sizga tez orada buyurtmani tasdiqlash uchun qo'ng'iroq qilamiz</li>
+                    <li>Buyurtma tayyorlangandan so'ng SMS orqali xabar beramiz</li>
+                    <li>Yetkazib berish 2-3 ish kuni ichida amalga oshiriladi</li>
+                    <li>Buyurtma holatini profilingizda kuzatishingiz mumkin</li>
+                </ul>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'order_history' %}" class="btn btn-primary me-3">
+                    <i class="fas fa-list"></i> Buyurtmalar Tarixi
+                </a>
+                <a href="{% url 'drone_list' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-shopping-bag"></i> Xaridni Davom Ettirish
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

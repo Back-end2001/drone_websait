@@ -1,0 +1,232 @@
+{% extends 'drone/base.html' %}
+
+{% block title %}Profil - AeroKo'rish{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-3">
+            <!-- Profile Sidebar -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-user-circle fa-4x text-muted"></i>
+                    </div>
+                    <h5>{{ user.first_name }} {{ user.last_name }}</h5>
+                    <p class="text-muted">{{ user.email }}</p>
+                </div>
+            </div>
+            
+            <div class="list-group mt-3">
+                <a href="#profile-info" class="list-group-item list-group-item-action active" data-bs-toggle="tab">
+                    <i class="fas fa-user me-2"></i>Shaxsiy Ma'lumotlar
+                </a>
+                <a href="#order-history" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                    <i class="fas fa-shopping-bag me-2"></i>Buyurtmalar Tarixi
+                </a>
+                <a href="#change-password" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                    <i class="fas fa-lock me-2"></i>Parolni O'zgartirish
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-lg-9">
+            <div class="tab-content">
+                <!-- Profile Information -->
+                <div class="tab-pane fade show active" id="profile-info">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Shaxsiy Ma'lumotlar</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.first_name.id_for_label }}" class="form-label">Ism</label>
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                            <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.last_name.id_for_label }}" class="form-label">Familiya</label>
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                            <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.phone.id_for_label }}" class="form-label">Telefon</label>
+                                    {{ form.phone }}
+                                    {% if form.phone.errors %}
+                                        <div class="text-danger small">{{ form.phone.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.address.id_for_label }}" class="form-label">Manzil</label>
+                                    {{ form.address }}
+                                    {% if form.address.errors %}
+                                        <div class="text-danger small">{{ form.address.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.city.id_for_label }}" class="form-label">Shahar</label>
+                                        {{ form.city }}
+                                        {% if form.city.errors %}
+                                            <div class="text-danger small">{{ form.city.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.postal_code.id_for_label }}" class="form-label">Pochta Indeksi</label>
+                                        {{ form.postal_code }}
+                                        {% if form.postal_code.errors %}
+                                            <div class="text-danger small">{{ form.postal_code.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">Tug'ilgan Sana</label>
+                                    {{ form.date_of_birth }}
+                                    {% if form.date_of_birth.errors %}
+                                        <div class="text-danger small">{{ form.date_of_birth.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Saqlash
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Order History -->
+                <div class="tab-pane fade" id="order-history">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">So'nggi Buyurtmalar</h5>
+                            <a href="{% url 'order_history' %}" class="btn btn-sm btn-outline-primary">Barchasini Ko'rish</a>
+                        </div>
+                        <div class="card-body">
+                            {% if orders %}
+                                {% for order in orders %}
+                                <div class="d-flex justify-content-between align-items-center py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                                    <div>
+                                        <strong>Buyurtma #{{ order.order_number }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ order.created_at|date:"d.m.Y" }}</small>
+                                    </div>
+                                    <div class="text-center">
+                                        {% if order.status == 'pending' %}
+                                            <span class="badge bg-warning">{{ order.get_status_display }}</span>
+                                        {% elif order.status == 'confirmed' %}
+                                            <span class="badge bg-info">{{ order.get_status_display }}</span>
+                                        {% elif order.status == 'processing' %}
+                                            <span class="badge bg-primary">{{ order.get_status_display }}</span>
+                                        {% elif order.status == 'shipped' %}
+                                            <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+                                        {% elif order.status == 'delivered' %}
+                                            <span class="badge bg-success">{{ order.get_status_display }}</span>
+                                        {% elif order.status == 'cancelled' %}
+                                            <span class="badge bg-danger">{{ order.get_status_display }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-end">
+                                        <strong class="text-primary">${{ order.total_amount }}</strong>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-shopping-bag fa-2x text-muted mb-2"></i>
+                                    <p class="text-muted">Hali buyurtmalar yo'q</p>
+                                    <a href="{% url 'drone_list' %}" class="btn btn-primary">Xarid Qilishni Boshlash</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Change Password -->
+                <div class="tab-pane fade" id="change-password">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Parolni O'zgartirish</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="password-form">
+                                {% csrf_token %}
+                                
+                                <div class="mb-3">
+                                    <label for="current_password" class="form-label">Joriy Parol</label>
+                                    <input type="password" class="form-control" id="current_password" name="current_password" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="new_password1" class="form-label">Yangi Parol</label>
+                                    <input type="password" class="form-control" id="new_password1" name="new_password1" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="new_password2" class="form-label">Yangi Parolni Tasdiqlang</label>
+                                    <input type="password" class="form-control" id="new_password2" name="new_password2" required>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-key"></i> Parolni O'zgartirish
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Password change form handler
+document.getElementById('password-form')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch('/parol-ozgartirish/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Parol muvaffaqiyatli o\'zgartirildi!');
+            this.reset();
+        } else {
+            alert('Xatolik: ' + (data.error || 'Noma\'lum xatolik'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Xatolik yuz berdi. Qayta urinib ko\'ring.');
+    });
+});
+</script>
+{% endblock %}

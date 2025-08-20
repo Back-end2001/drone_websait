@@ -1,0 +1,194 @@
+{% extends 'drone/base.html' %}
+
+{% block title %}Savat - AeroKo'rish{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4 text-white">Savatingiz</h2>
+            
+            {% if cart.items.all %}
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            {% for item in cart.items.all %}
+                            <div class="cart-item row align-items-center py-3 {% if not forloop.last %}border-bottom{% endif %}" data-item-id="{{ item.id }}">
+                                <div class="col-md-2">
+                                    {% if item.drone.image %}
+                                        <img src="{{ item.drone.image.url }}" class="img-fluid rounded" alt="{{ item.drone.name_uz }}" style="height: 80px; object-fit: cover;">
+                                    {% else %}
+                                        <img src="https://via.placeholder.com/80x80?text=Dron" class="img-fluid rounded" alt="{{ item.drone.name_uz }}">
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="mb-1">{{ item.drone.name_uz }}</h6>
+                                    <small class="text-muted">{{ item.drone.category.name_uz }}</small>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="fw-bold">${{ item.drone.price }}</span>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="input-group input-group-sm">
+                                        <button class="btn btn-outline-secondary quantity-btn" type="button" data-action="decrease">-</button>
+                                        <input type="number" class="form-control text-center quantity-input" value="{{ item.quantity }}" min="1" max="{{ item.drone.stock_quantity }}">
+                                        <button class="btn btn-outline-secondary quantity-btn" type="button" data-action="increase">+</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <span class="fw-bold item-total">${{ item.get_total_price }}</span>
+                                </div>
+                                <div class="col-md-1">
+                                    <button class="btn btn-sm btn-outline-danger remove-item" data-item-id="{{ item.id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <a href="{% url 'drone_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left"></i> Xaridni Davom Ettirish
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Buyurtma Xulosasi</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Mahsulotlar soni:</span>
+                                <span id="total-items">{{ cart.get_total_items }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Yetkazib berish:</span>
+                                <span class="text-success">Bepul</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-3">
+                                <strong>Jami:</strong>
+                                <strong id="total-price">${{ cart.get_total_price }}</strong>
+                            </div>
+                            <div class="d-grid">
+                                <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg">
+                                    Buyurtma Berish
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Promo Code -->
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h6>Chegirma Kodi</h6>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Kodni kiriting">
+                                <button class="btn btn-outline-secondary" type="button">Qo'llash</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center text-white py-5">
+                <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                <h4>Savatingiz bo'sh</h4>
+                <p class="text-white">Hali hech qanday mahsulot qo'shilmagan</p>
+                <a href="{% url 'drone_list' %}" class="btn btn-primary">Xarid Qilishni Boshlash</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Quantity update handlers
+document.querySelectorAll('.quantity-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const action = this.dataset.action;
+        const input = this.parentNode.querySelector('.quantity-input');
+        const itemId = this.closest('.cart-item').dataset.itemId;
+        let quantity = parseInt(input.value);
+        
+        if (action === 'increase') {
+            quantity++;
+        } else if (action === 'decrease' && quantity > 1) {
+            quantity--;
+        }
+        
+        input.value = quantity;
+        updateCartItem(itemId, quantity);
+    });
+});
+
+// Direct quantity input change
+document.querySelectorAll('.quantity-input').forEach(input => {
+    input.addEventListener('change', function() {
+        const itemId = this.closest('.cart-item').dataset.itemId;
+        const quantity = parseInt(this.value);
+        
+        if (quantity > 0) {
+            updateCartItem(itemId, quantity);
+        }
+    });
+});
+
+// Remove item handlers
+document.querySelectorAll('.remove-item').forEach(button => {
+    button.addEventListener('click', function() {
+        const itemId = this.dataset.itemId;
+        updateCartItem(itemId, 0);
+    });
+});
+
+// Update cart item function
+function updateCartItem(itemId, quantity) {
+    fetch('{% url "update_cart" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            item_id: itemId,
+            quantity: quantity
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (quantity === 0) {
+                // Remove item from DOM
+                document.querySelector(`[data-item-id="${itemId}"]`).remove();
+                
+                // Check if cart is empty
+                if (document.querySelectorAll('.cart-item').length === 0) {
+                    location.reload();
+                }
+            } else {
+                // Update item total
+                const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
+                const itemTotal = itemElement.querySelector('.item-total');
+                const price = parseFloat(itemElement.querySelector('.fw-bold').textContent.replace('$', ''));
+                itemTotal.textContent = '$' + (price * quantity).toFixed(2);
+            }
+            
+            // Update totals
+            document.getElementById('total-price').textContent = '$' + data.cart_total;
+            document.getElementById('total-items').textContent = data.cart_items;
+            document.getElementById('cart-count').textContent = data.cart_items;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
+{% endblock %}

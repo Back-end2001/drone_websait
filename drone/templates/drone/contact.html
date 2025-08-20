@@ -1,0 +1,253 @@
+{% extends 'drone/base.html' %}
+
+{% block title %}Aloqa - AeroKo'rish{% endblock %}
+
+{% block navbar %}
+{% endblock %}
+{% block content %}
+<!-- Contact Hero -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold">Biz Bilan Bog'laning</h1>
+                <p class="lead">Savollaringiz yoki takliflaringiz bo'lsa, biz bilan bog'laning. Sizga yordam berishdan mamnunmiz!</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container py-5">
+    <div class="row">
+        <!-- Contact Form -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Xabar Yuborish</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">Ismingiz</label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger small">{{ form.name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">Telefon</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                                <div class="text-danger small">{{ form.phone.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.message.id_for_label }}" class="form-label">Xabar</label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                                <div class="text-danger small">{{ form.message.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-paper-plane"></i> Xabar Yuborish
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contact Information -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Aloqa Ma'lumotlari</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6><i class="fas fa-map-marker-alt text-primary me-2"></i>Manzil</h6>
+                        <p class="mb-0">123 Aviation Way, Sky City, Toshkent 100000</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6><i class="fas fa-phone text-primary me-2"></i>Telefon</h6>
+                        <p class="mb-0">
+                            <a href="tel:+998901234567" class="text-decoration-none">+998 90 123 45 67</a><br>
+                            <a href="tel:+998712345678" class="text-decoration-none">+998 71 234 56 78</a>
+                        </p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6><i class="fas fa-envelope text-primary me-2"></i>Email</h6>
+                        <p class="mb-0">
+                            <a href="mailto:info@aerokorish.uz" class="text-decoration-none">info@aerokorish.uz</a><br>
+                            <a href="mailto:support@aerokorish.uz" class="text-decoration-none">support@aerokorish.uz</a>
+                        </p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6><i class="fas fa-clock text-primary me-2"></i>Ish Vaqti</h6>
+                        <p class="mb-0">
+                            Dushanba - Juma: 9:00 - 18:00<br>
+                            Shanba: 10:00 - 16:00<br>
+                            Yakshanba: Dam olish kuni
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h6><i class="fas fa-share-alt text-primary me-2"></i>Ijtimoiy Tarmoqlar</h6>
+                        <div class="d-flex gap-2">
+                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                <i class="fab fa-telegram"></i>
+                            </a>
+                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FAQ -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Tez-tez So'raladigan Savollar</h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq1">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                    Yetkazib berish qancha vaqt oladi?
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Toshkent shahrida 1 kun, boshqa viloyatlarda 2-3 ish kuni ichida yetkazib beramiz.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                    Kafolat muddati qancha?
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Barcha dronlarimizga 2 yillik kafolat beramiz. Kafolat muddatida bepul ta'mirlash.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                    To'lov usullari qanday?
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Naqd pul, bank kartalari va bank o'tkazmalari orqali to'lash mumkin.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Map Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Bizning Joylashuvimiz</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div style="height: 400px; background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <div class="text-center">
+                            <i class="fas fa-map-marked-alt fa-3x text-muted mb-3"></i>
+                            <h5>Xarita</h5>
+                            <p class="text-muted">123 Aviation Way, Sky City, Toshkent</p>
+                            <a href="https://maps.google.com" target="_blank" class="btn btn-primary">
+                                Google Maps da Ko'rish
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contact Methods -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="text-center mb-4">Boshqa Aloqa Usullari</h3>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="fas fa-headset fa-3x text-primary mb-3"></i>
+                    <h5>Qo'ng'iroq Qiling</h5>
+                    <p>Bizning call-markazimiz 24/7 ishlaydi</p>
+                    <a href="tel:+998901234567" class="btn btn-primary">
+                        <i class="fas fa-phone"></i> Qo'ng'iroq
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="fab fa-telegram fa-3x text-primary mb-3"></i>
+                    <h5>Telegram Bot</h5>
+                    <p>Telegram botimiz orqali tez yordam oling</p>
+                    <a href="https://t.me/aerokorish_bot" target="_blank" class="btn btn-primary">
+                        <i class="fab fa-telegram"></i> Telegram
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="fas fa-comments fa-3x text-primary mb-3"></i>
+                    <h5>Online Chat</h5>
+                    <p>Saytdagi chat orqali darhol javob oling</p>
+                    <button class="btn btn-primary" onclick="openChat()">
+                        <i class="fas fa-comment"></i> Chat Boshlash
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openChat() {
+    alert('Chat tez orada ishga tushiriladi!');
+}
+</script>
+{% endblock %}
